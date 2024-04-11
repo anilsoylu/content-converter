@@ -8,6 +8,19 @@ body,
   min-height: 100%;
 }
 
+[data-rehype-pretty-code-fragment] {
+  position: relative;
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+[data-rehype-pretty-code-fragment] .line {
+  display: inline-block;
+  min-height: 1rem;
+  width: 100%;
+  padding: 0.125rem 1rem;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

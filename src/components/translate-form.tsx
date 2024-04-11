@@ -2,6 +2,7 @@ import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, useFieldArray } from "react-hook-form"
 import { z } from "zod"
+import { useToast } from "@/components/ui/use-toast"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Files } from "lucide-react"
 
 const formSchema = z.object({
   content: z.string().min(1, "Content is required"),
@@ -27,6 +29,7 @@ const formSchema = z.object({
 })
 
 const TranslateForm = () => {
+  const { toast } = useToast()
   const [translatedContent, setTranslatedContent] = useState<string>("")
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,7 +46,8 @@ const TranslateForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    let { content, translations } = values
+    let { content } = values
+    const { translations } = values
     translations.forEach(({ oldWord, newWord }) => {
       const regex = new RegExp(`\\b${oldWord}\\b`, "gi")
       content = content.replace(regex, (matched) => {
@@ -56,6 +60,15 @@ const TranslateForm = () => {
       })
     })
     setTranslatedContent(content)
+  }
+
+  const handleCopyContent = () => {
+    navigator.clipboard.writeText(translatedContent).then(() => {
+      toast({
+        title: "Content copied",
+        description: "The translated content has been copied to your clipboard",
+      })
+    })
   }
 
   return (
@@ -138,7 +151,25 @@ const TranslateForm = () => {
       {translatedContent && (
         <div className="mt-8">
           <h2 className="text-lg font-semibold">Translated Content</h2>
-          <p className="mt-2">{translatedContent}</p>
+          <div data-rehype-pretty-code-fragment>
+            <pre className="bg-zinc-900 rounded-lg p-3 text-sm font-mono overflow-y-auto overflow-x-hidden whitespace-pre-wrap max-h-64 z-0">
+              <code className="relative px-[0.3rem] py-[0.2rem] font-mono text-sm">
+                {translatedContent}
+              </code>
+            </pre>
+            <Button
+              onClick={handleCopyContent}
+              className="absolute right-4 top-4 p-0 w-6 h-6 hover:bg-zinc-800 z-10"
+            >
+              <span className="sr-only">Copy</span>
+              <Files
+                size={15}
+                className="h-4 w-4"
+                color="#ffffff"
+                strokeWidth={1}
+              />
+            </Button>
+          </div>
         </div>
       )}
     </div>
