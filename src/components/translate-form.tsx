@@ -43,11 +43,17 @@ const TranslateForm = () => {
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
     let { content, translations } = values
     translations.forEach(({ oldWord, newWord }) => {
-      const regex = new RegExp(oldWord, "gi")
-      content = content.replace(regex, newWord)
+      const regex = new RegExp(`\\b${oldWord}\\b`, "gi")
+      content = content.replace(regex, (matched) => {
+        return matched === matched.toUpperCase()
+          ? newWord.toUpperCase()
+          : matched ===
+            matched[0].toUpperCase() + matched.slice(1).toLowerCase()
+          ? newWord[0].toUpperCase() + newWord.slice(1).toLowerCase()
+          : newWord.toLowerCase()
+      })
     })
     setTranslatedContent(content)
   }
